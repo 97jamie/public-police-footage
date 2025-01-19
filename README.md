@@ -25,15 +25,15 @@ This repository is for the paper Constructing Datasets From Public Police Body C
 ```
 2. Output can be found under `output/ocr-[date-time]`
 
-
-### Running OCR - custom data (CPU)
+## Running OCR - custom data
+### CPU
 1. To speed up the OCR and only run the OCR on body-worn camera footage, you may include a JSON annotation file for each video. The name of the annotations file should match the name of the video file (e.g. `video123.mp4` should be named `video123.json`). Your annotation files must follow the same structure of the provided JSON files under `annotations-json`.
 2. Run:
 ```python ocr.py --video_dir path_to_videos --anno_dir path_to_custom_annotations
 ```
 3. Output can be found under `output/ocr-[date-time]`
 
-### Running OCR - custom data (GPU)
+### GPU
 ...
 
 ## Segmenting the audio
