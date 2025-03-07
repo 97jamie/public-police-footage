@@ -105,7 +105,7 @@ def ocr_captions(video_path, anno_data, reader):
 
 
 
-def main(base_dir, anno_dir, output_dir):
+def main(base_dir='output/yt-out', anno_dir='annotations', output_dir='output/ocr-out'):
     reader = PaddleOCR()
 
     print(f"Starting processing in base directory: {base_dir}")
@@ -151,9 +151,9 @@ def main(base_dir, anno_dir, output_dir):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='OCR - caption extraction')
-    parser.add_argument('video_dir', type=str, help='Directory containing videos')
-    parser.add_argument('anno_dir', type=str, help='Directory containing JSON annotations')
-    parser.add_argument('output_dir', type=str, help='Directory to save the transcripts')
+    parser.add_argument('--video_dir', type=str, default='output/yt-out', help='Directory containing videos (optional)')
+    parser.add_argument('--anno_dir', type=str, default='annotations', help='Directory containing JSON annotations (optional)')
+    parser.add_argument('--output_dir', type=str, default='output', help='Directory to save the transcripts (optional)')
 
     args = parser.parse_args()
     main(args.video_dir, args.anno_dir, args.output_dir)
