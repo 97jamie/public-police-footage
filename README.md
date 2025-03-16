@@ -14,16 +14,24 @@ pip install -r ./config/requirements.txt
 ## Downloading videos - base dataset
 1. First, download the videos. You will need to pass a cookie file to the download script (see below "How to pass YouTube cookies"). Then, use the script yt-dlp.sh with a file list from the config directory to download videos:
 ```
-# Download the hand-cleanded videos
+# Download the hand-cleaned videos
 ./yt-dlp.sh config/batch_hand.txt
 
 # Download the automatically cleaned videos
 ./yt-dlp.sh config/batch.txt
 
 ```
-Outputs can be found in the `output` folder
+Outputs can then be found in the `output` folder
 
-2. Run OCR to extract captions.
+2. Run OCR to extract captions. This can be done with the python script ocr.py. The script takes as arguments the top-level directory containing video files (`--video_dir`), the directory containing json annotation files (`--anno_dir`, default = `annotations`), a directory to store outputs (`--output_dir`), where the outputs will preserve the directory structure of the video files. The script also takes a flag (`--hand`), which indicates if you are processing hand-corrected files and should take frame_start and frame_end times.
+
+```
+# Extract captions from the hand-cleaned videos
+python ocr.py --video_dir output/batch_hand --hand --anno_dir annotations --output_dir output/batch_hand
+
+# Extract captions from the automatically cleaned videos
+python ocr.py --video_dir output/batch --anno_dir annotations --output_dir output/batch
+```
 
 3. [Optional] extract segments from audio
 4. [Optional] explore and validate results
