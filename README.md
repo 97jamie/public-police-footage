@@ -33,7 +33,12 @@ python ocr.py --video_dir output/batch_hand --hand --anno_dir annotations --outp
 python ocr.py --video_dir output/batch --anno_dir annotations --output_dir output/batch
 ```
 
-3. [Optional] extract segments from audio
+3. [Optional] extract segments from audio. In steps #1 and #2, you will have fully downloaded and constructed the data. The script `conversion.py` can be used to convert the original video files into audio segments. This will result in many small files. The script takes as arguments the directory containing the video files (`--base_dir`), the directory containing the json caption files (`--anno_dir`) and a directory to write outputs (`--output_dir`). The script assumes that `--base_dir` and `--anno_dir` contain the same directory structure, which will be replicated in `--output_dir`.
+```
+# Clip hand-cleaned videos into audio segments, one corresponding to each caption
+python conversion.py --base_dir output/batch_hand --anno_dir output/batch_hand --output_dir segment_test
+```
+
 4. [Optional] explore and validate results
 
 ## Downloading videos - custom data
