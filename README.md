@@ -12,10 +12,21 @@ pip install -r ./config/requirements.txt
 
 
 ## Downloading videos - base dataset
-1. From your `police-data` directory, run:
-``` ./yt-dlp.sh
+1. First, download the videos. You will need to pass a cookie file to the download script (see below "How to pass YouTube cookies"). Then, use the script yt-dlp.sh with a file list from the config directory to download videos:
 ```
-3. Output can be found under `output/yt-[date-time]`
+# Download the hand-cleanded videos
+./yt-dlp.sh config/batch_hand.txt
+
+# Download the automatically cleaned videos
+./yt-dlp.sh config/batch.txt
+
+```
+Outputs can be found in the `output` folder
+
+2. Run OCR to extract captions.
+
+3. [Optional] extract segments from audio
+4. [Optional] explore and validate results
 
 ## Downloading videos - custom data
 1. Navigate to your `police-data/config` directory.
