@@ -3,7 +3,13 @@
 This repository is for the paper Constructing Datasets From Public Police Body Camera Footage by Jamie Rosas-Smith, Martijn Bartelds, Ruizhe Huang, Leibny Paola García-Perera, Karen Livescu, Dan Jurafsky, and Anjalie Field. It includes code for downloading and processing public police body-worn camera footage from YouTube. The resulting data is ready for training and fine-tuning of off-the-shelf ASR models, and we provide code for fine-tuning Whisper using our dataset.
 
 ## Requirements and Installation
-...
+Create a conda environment and install the packages in config/requirements.txt:
+```
+conda create -n police python=3.9 -y
+conda activate police
+pip install -r ./config/requirements.txt
+```
+
 
 ## Downloading videos - base dataset
 1. From your `police-data` directory, run:
