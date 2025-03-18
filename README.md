@@ -39,23 +39,18 @@ python ocr.py --video_dir output/batch --anno_dir annotations --output_dir outpu
 python conversion.py --base_dir output/batch_hand --anno_dir output/batch_hand --output_dir segment_test
 ```
 
-4. [Optional] explore and validate results
+4. [Optional] The notebook test_data.ipynb offers some functions to aid in exploring and validating the dowloaded data
 
 ## Downloading videos - custom data
-1. Navigate to your `police-data/config` directory.
-2. Open `batch.txt`.
-3. To download both the base dataset and custom data, simply append any new links to public YouTube playlists or videos. If you only want to download custom data, delete the existing links and enter your own. Enter each link on a separate line.
-4. Run:
-``` ./yt-dlp.sh
+1. New videos can be downloaded using the same `yt-dlp.sh` script. Add URLs to videos or public playlists to a config file in the same format as `config/batch.txt` and pass the new file to `yt-dlp.sh`. For example:
 ```
+./yt-dlp.sh config/new_batch.txt
 
-## Running OCR - base dataset
-1. Run:
-```python ocr.py
 ```
-2. Output can be found under `output/ocr-[date-time]`
+2. Extract on-screen captions with OCR: TODO
 
-## Running OCR - custom data
+
+<!-- ## Running OCR - custom data
 ### CPU
 1. To speed up the OCR and only run the OCR on body-worn camera footage, you may include a JSON annotation file for each video. The name of the annotations file should match the name of the video file (e.g. `video123.mp4` should be named `video123.json`). Your annotation files must follow the same structure of the provided JSON files under `annotations-json`.
 2. Run:
@@ -64,16 +59,8 @@ python conversion.py --base_dir output/batch_hand --anno_dir output/batch_hand -
 3. Output can be found under `output/ocr-[date-time]`
 
 ### GPU
-...
+... -->
 
-## Segmenting the audio
-1. Run:
-```python conversion.py path_to_videos path_to_annotations
-```
-2. Output can be found under `output/segments-[date-time]`
-
-## Dataset validation
-...
 
 ### How to pass YouTube cookies to yt-dlp:
 
