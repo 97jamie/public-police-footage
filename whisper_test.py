@@ -12,7 +12,6 @@ model = whisper.load_model("turbo")
 # print(result["text"])
 
 def test_all(segment_dir, anno_dir):
-    results = []
     for root, _, files in os.walk(anno_dir):
         for file in files:
             # Find and load annotations files
