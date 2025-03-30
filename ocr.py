@@ -40,8 +40,13 @@ def extract_text_paddle(frame, ocr_reader):
     return None
 
 
-def ocr_captions(video_path, anno_data, reader):  
-    print(anno_data)
+def ocr_captions(video_path, anno_data, reader, hand):
+    if hand:
+        start = "start_frame"
+        end = "end_frame"
+    else:
+        start = "start"
+        end = "end"
     try:
         logger = logging.getLogger('ppocr')
         logger.setLevel(logging.ERROR)
@@ -75,8 +80,8 @@ def ocr_captions(video_path, anno_data, reader):
                 if i in processed_entries:
                     continue
 
-                if 'start' in entry and 'end' in entry:
-                    if has_overlap(start_time, end_time, entry['start'], entry['end']):
+                if start in entry and end in entry:
+                    if has_overlap(start_time, end_time, entry[start], entry[end]):
                         height, _, _ = frame.shape
                         crop = int(2 * height / 3)
                         cropped_frame = frame[crop:]
@@ -105,7 +110,7 @@ def ocr_captions(video_path, anno_data, reader):
 
 
 
-def main(base_dir='output/yt-out', anno_dir='annotations', output_dir='output/ocr-out'):
+def main(base_dir, anno_dir, output_dir, hand):
     reader = PaddleOCR()
 
     print(f"Starting processing in base directory: {base_dir}")
@@ -118,7 +123,6 @@ def main(base_dir='output/yt-out', anno_dir='annotations', output_dir='output/oc
                 video_id = os.path.splitext(file)[0]
                 anno_filename = f"{video_id}.json"
                 anno_path = os.path.join(anno_dir, anno_filename)
-                print(anno_path)
                 if os.path.exists(anno_path):
                     try:
                         with open(anno_path, 'r') as json_file:
@@ -127,13 +131,13 @@ def main(base_dir='output/yt-out', anno_dir='annotations', output_dir='output/oc
                         print(f"Failed to parse annotation file {anno_path}")
                         continue
 
-                    video_data = ocr_captions(file_path, anno_data, reader)
+                    video_data = ocr_captions(file_path, anno_data, reader, hand)
                 else:
                     print(f"No annotation file found for {file_path}")
                     video_data = []
 
                 if video_data:
-                    channel_dir = os.path.basename(os.path.dirname(root))
+                    channel_dir = os.path.basename(os.path.dirname(file_path))
                     final_output_dir = os.path.join(output_dir, channel_dir)
                     print(f"Output directory: {final_output_dir}")
                     os.makedirs(final_output_dir, exist_ok=True)
@@ -151,9 +155,10 @@ def main(base_dir='output/yt-out', anno_dir='annotations', output_dir='output/oc
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='OCR - caption extraction')
-    parser.add_argument('--video_dir', type=str, default='output/yt-out', help='Directory containing videos (optional)')
-    parser.add_argument('--anno_dir', type=str, default='annotations', help='Directory containing JSON annotations (optional)')
-    parser.add_argument('--output_dir', type=str, default='output', help='Directory to save the transcripts (optional)')
+    parser.add_argument('--video_dir', type=str, help='Directory containing videos')
+    parser.add_argument('--hand', action='store_true', help='Whether or not the annotations contain hand corrections')
+    parser.add_argument('--anno_dir', type=str, default='annotations', help='Directory containing JSON annotations (default=annotations)')
+    parser.add_argument('--output_dir', type=str, help='Directory to save the transcripts')
 
     args = parser.parse_args()
-    main(args.video_dir, args.anno_dir, args.output_dir)
+    main(args.video_dir, args.anno_dir, args.output_dir, args.hand)

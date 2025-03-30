@@ -28,6 +28,7 @@ def splice_audio(input_wav, output_dir, base_filename, segments):
 
     for i, (start, end) in enumerate(segments):
         output_file = os.path.join(output_dir, f"{base_filename}_{i + 1}.wav")
+
         command = [
             "ffmpeg",
             "-i", input_wav,
@@ -96,8 +97,8 @@ def process_annotation_file(anno_path):
             with open(anno_path, 'r') as json_file:
                 anno_data = json.load(json_file)  # Load JSON data
                 for entry in anno_data:
-                    if "start" in entry and "end" in entry:
-                        segments.append((entry["start"], entry["end"]))
+                    if "start_time" in entry and "end_time" in entry:
+                        segments.append((entry["start_time"], entry["end_time"]))
         except json.JSONDecodeError:
             logger.error(f"Failed to parse annotation file {anno_path}")
     else:
@@ -122,7 +123,9 @@ def main(base_dir, anno_dir, output_dir):
 
                     video_id = os.path.splitext(file)[0]
                     anno_filename = f"{video_id}.json"
-                    anno_path = os.path.join(anno_dir, anno_filename)
+                    channel_dir = os.path.basename(os.path.dirname(video_path))
+                    anno_path = os.path.join(anno_dir, channel_dir)
+                    anno_path = os.path.join(anno_path, anno_filename)
 
                     if not os.path.exists(anno_path):
                         logger.warning(f"Skipping {video_path}: Annotation file {anno_path} does not exist")
@@ -152,9 +155,9 @@ def main(base_dir, anno_dir, output_dir):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Convert videos to WAV and splice based on timestamps')
-    parser.add_argument('base_dir', type=str, help='Parent directory containing video files to process')
-    parser.add_argument('anno_dir', type=str, help='Parent directory containing annotation files')
-    parser.add_argument('output_dir', type=str, help='Directory to save spliced WAV files')
+    parser.add_argument('--base_dir', type=str, help='Parent directory containing video files to process')
+    parser.add_argument('--anno_dir', type=str, help='Parent directory containing annotation files')
+    parser.add_argument('--output_dir', type=str, help='Directory to save spliced WAV files')
 
     args = parser.parse_args()
 

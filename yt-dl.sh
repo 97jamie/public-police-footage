@@ -1,33 +1,15 @@
 #!/bin/bash
 
-eval "$(conda shell.bash hook)"
-
-if ! command -v conda &> /dev/null; then
-    echo "Download failed; please install conda first"
-    exit 1
-fi
-
-ENV_NAME="police"
-
-if ! conda info --envs | grep -q "$ENV_NAME"; then
-    echo "Creating conda environment..."
-    conda create -n "$ENV_NAME" python=3.9 -y
-fi
-
-source activate "$ENV_NAME" || { echo "activating conda environment failed"; exit 1; }
-
-if [ -f "./config/requirements.txt" ]; then
-    echo "Installing Python packages from requirements.txt..."
-    pip install -r ./config/requirements.txt
-else
-    echo "requirements.txt not found in ./config."
-    exit 1
-fi
+# This script takes as an argument a txt file containing a list of YouTube
+# URLs to download (e.g. config/batch.txt or config/batch_hand.txt)
+# example usage: ./yt-dl.sh config/batch_hand.txt
+# outputs are saved to output/[filename]
 
 BASE_DIR="$(pwd)"
-OUTPUT_DIR="${BASE_DIR}/output/youtube"
+BATCH_FILE="$1"
+BATCH_NAME="$(basename ${BATCH_FILE} .txt)"
+OUTPUT_DIR="${BASE_DIR}/output/${BATCH_NAME}"
 ARCHIVE_FILE="${BASE_DIR}/config/archive.txt"
-BATCH_FILE="${BASE_DIR}/config/batch.txt"
 COOKIES_FILE="${BASE_DIR}/config/cookies.txt"
 
 VIDEO_FORMAT="bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best"
@@ -45,7 +27,6 @@ yt-dlp \
     --write-description \
     --write-info-json \
     --write-annotations \
-    --quiet \
     --no-warnings \
     --all-subs \
     --sub-format "${SUB_FORMAT}" \
