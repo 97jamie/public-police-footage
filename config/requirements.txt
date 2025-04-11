@@ -1,0 +1,7 @@
+paddleocr==2.7.3
+paddlepaddle 
+opencv-python-headless
+numpy==1.24
+yt-dlp
+openai-whisper
+jiwer
