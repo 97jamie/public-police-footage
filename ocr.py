@@ -6,7 +6,21 @@ import json
 from paddleocr import PaddleOCR
 import logging
 import traceback
+import re
 
+def auto_fix_caption(text):
+    text = re.sub(r'\s+([,.!?])', r'\1', text)
+    text = re.sub(r'\b(\w{2,})\s+s\b', r'\1s', text)
+    text = re.sub(r"\b([a-zA-Z]+)\s+'\s+([a-zA-Z]+)\b", r"\1'\2", text)
+    text = re.sub(
+        r'^\s*(officer\s*\d*|officer|driver|community|subject|suspect|pa system|radio traffic|unknown)\s*[-:]?\s*',
+        '', text, flags=re.I
+    )
+
+    if '"' in text:
+        text = re.sub(r'^.*?"', '', text)
+    
+    return text
 
 def convert_to_mm_ss(time_in_seconds):
     minutes, seconds = divmod(int(time_in_seconds), 60)
@@ -17,13 +31,47 @@ def has_overlap(start_time, end_time, start_segment, end_segment):
     return (start_segment < end_time and end_segment > start_time)
 
 
-def clean_caption(entry, caption):
+def remove_before_colon(text):
+    if ':' in text:
+        return text.split(':', 1)[1].strip()
+    return text
+
+def remove_text_between_symbols(text):
+    pattern = r'\(.*?\)|\[.*?\]|\*.*?\*'
+    return re.sub(pattern, '', text).strip()
+
+def replace_bleeped_curse_words(text):
+    curse_word_replacements = {
+        r'\bf[\*\-]*[u@]ck\b': 'fuck',
+        r'\bf[\*\-]*[u@]cker\b': 'fucker',
+        r'\bf[\*\-]*[u@]cking\b': 'fucking',
+        r'\bs[\*\-]*h[i1]t\b': 'shit'
+    }
+    for pattern, replacement in curse_word_replacements.items():
+        text = re.sub(pattern, replacement, text, flags=re.IGNORECASE)
+    return text
+
+def normalize_chars(text):
+    text = re.sub(r'[‐‑–—]', '-', text)  # normalize dashes
+    text = re.sub(r'[•·◦●]', '', text)  # remove bullets
+    text = re.sub(r'[^a-zA-Z0-9\s.,!?\'"-]', '', text)  # remove stray junk chars
+    return text
+
+def clean_caption_text(text, hand==False):
+    text = remove_before_colon(text)
+    text = remove_text_between_symbols(text)
+    text = replace_bleeped_curse_words(text)
+    text = normalize_chars(text)
+    if not hand:
+        text = auto_fix_caption(text)
+    return text.strip()
+
+def apply_replacements(entry, caption):
     to_replace = entry['to_replace']
     replace_with = entry['replace_with']
     if to_replace and replace_with:
         return caption.replace(to_replace, replace_with)
     return caption
-
 
 def extract_text_paddle(frame, ocr_reader):
     upsample = cv2.resize(frame, (0, 0), fx=2, fy=2)
@@ -87,14 +135,14 @@ def ocr_captions(video_path, anno_data, reader, hand):
                         cropped_frame = frame[crop:]
 
                         caption = extract_text_paddle(cropped_frame, reader)
-                        print(start_time, end_time, caption)
                         if caption:
                             entry_data = {
                                 "start_time": entry["start"],
                                 "end_time": entry["end"],
-                                "text": clean_caption(entry, caption) if 'to_replace' in entry else caption,
+                                "text": apply_replacements(entry, caption) if 'to_replace' in entry else clean_caption_text(caption, hand),
                                 "speaker": entry["speaker"] if 'speaker' in entry else ""
                            }
+                            print(entry_data)
                             video_data.append(entry_data)
                             processed_entries.add(i)
 
